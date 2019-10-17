@@ -1,0 +1,62 @@
+AndroidStudio配置打jar包方式：
+注：以下build.gradle指的都是model的app build.gradle
+
+
+1.首先检查build.gradle中 apply plugin: 'com.android.library'是否是library而不是application；
+注释掉applicationId
+注释掉versionCode
+注释掉versionName
+
+
+2.在中android{}模块中配置如下：
+
+android {
+
+  lintOptions {
+        abortOnError false
+    }
+    
+}
+
+3.在所要打的model的app build.gradle结尾处配置：
+//打jar包配置
+task makeJar(type: Copy) {
+    //删除存在的
+    delete 'build/libs/sotong_1.0.0.jar'
+    //设置拷贝的文件
+    from('build/intermediates/packaged-classes/release/')
+    //打进jar包后的文件目录
+    into('build/libs/')
+    //将classes.jar放入build/libs/目录下
+    //include ,exclude参数来设置过滤
+    //（我们只关心classes.jar这个文件）
+    include('classes.jar')
+    //重命名
+    rename('classes.jar', 'sotong_1.0.0.jar')
+}
+makeJar.dependsOn(build)
+
+4.使用gradle开始打jar包，在Androidstudio右侧点开Gradle找到当前model->Tasks->other->makeJar
+
+5.如果打jar的过程中有报错，那么先按照提示的错误信息改错，直到提示如下信息代表打jar包成功；
+
+
+BUILD SUCCESSFUL in 14s
+70 actionable tasks: 2 executed, 68 up-to-date
+18:14:10: Task execution finished 'makeJar'.
+
+6.输出目录：build->libs-名字.jar (如果没有可以在build/intermediates/packaged-classes/release/classes.jar找到的classes.jar文件就是打出的jar文件就是)
+
+7.复制出打好的jar文件，修改后缀名为.zip然后解压，找到BuildConfig.class文件删除，再添加压缩文件之后重新命名为.jar 文件就可有用了；
+
+
+
+
+
+
+
+
+
+
+
+
